@@ -45,7 +45,7 @@ declare namespace framework {
 
         source: {
             path: string;
-        };
+        }
 
         name: string;
 
@@ -59,7 +59,7 @@ declare namespace framework {
             host: string;
             addr: string;
             port: number;
-        };
+        }
 
         registry: {
             broker: {
@@ -96,14 +96,14 @@ declare namespace framework {
                 label: string;
                 profiles: string[];
             }
-        };
+        }
 
         sequelize: {
             database: string;
             username: string;
             password: string;
             options: any;
-        };
+        }
 
         database: {
             host: string;
@@ -153,13 +153,15 @@ declare namespace framework {
 
     function autoInject(target);
 
+    function injector();
+
     interface Context {
 
         req: object;
         res: object;
         respond: boolean;
 
-        request: Request;
+        request: IRequest;
         response: Response;
 
         cookies: object;
@@ -184,6 +186,10 @@ declare namespace framework {
 
         set(field: string, value: string): void;
 
+    }
+
+    interface IRequest extends Request {
+        query: any;
     }
 
     interface Next {

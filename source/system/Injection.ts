@@ -3,7 +3,11 @@
 import * as _ from 'lodash';
 import { Injector } from '@angular/core'
 
-export { autoInject, component, bootstrap };
+export { autoInject, component, bootstrap, injector };
+
+function injector() {
+	return (<any>global).__injector;
+}
 
 function autoInject(target) {
 
