@@ -16,9 +16,9 @@ function create(httpMethod: string) {
         return function annotate(target, property) {
 
             const value = Reflect.getMetadata(HTTP_LIST, target);
-            const list = (value as Map<String, Annotation>) || new Map<String, Annotation>();
+            const list = value as Annotation[] || [];
 
-            list.set(property, { httpMethod, routePath, property });
+            list.push({ httpMethod, routePath, property });
             Reflect.defineMetadata(HTTP_LIST, list, target);
 
         };
@@ -39,7 +39,7 @@ const Http = {
 
 const HttpMetadata = {
 
-    get(target): Map<String, Annotation> {
+    get(target): Annotation[] {
         return Reflect.getMetadata(HTTP_LIST, target);
     }
 

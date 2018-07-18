@@ -23,8 +23,8 @@ export class Router {
 		const annotations = HttpMetadata.get(controller);
 
 		const prefix = Prefix.get(controller);
-
-		for (const route of annotations.values()) {
+		
+		for (const route of annotations) {
 			const path = `${prefix}${route.routePath}`;
 			const handler = controller[route.property].bind(controller);
 
@@ -45,12 +45,15 @@ export class Router {
 }
 
 const Prefix = {
+
 	set(target, prefix) {
 		Reflect.defineMetadata(PREFIX, prefix, target);
 	},
+
 	get(target) {
 		return Reflect.getMetadata(PREFIX, target) || '';
 	}
+
 }
 
 async function parseBody(context: Context, next: Function) {

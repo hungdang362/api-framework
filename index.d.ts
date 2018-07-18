@@ -291,7 +291,7 @@ declare namespace framework {
     function sandBox(): boolean;
 
     namespace HttpMetadata {
-        function get(target): Map<String, Annotation>;
+        function get(target): Annotation[];
 
         interface Annotation {
             httpMethod: string;
