@@ -1,3 +1,6 @@
+import { Cookie, CookieAttr } from "cookies";
+import { CookieOptions } from "express";
+
 declare namespace framework {
 
     enum Environment {
@@ -157,14 +160,14 @@ declare namespace framework {
 
     interface Context {
 
-        req: object;
-        res: object;
+        req: object | any;
+        res: object | any;
         respond: boolean;
 
         request: IRequest;
         response: Response;
 
-        cookies: object;
+        cookies: Cookies;
         state: any;
 
         throw(status: number): never;
@@ -186,6 +189,11 @@ declare namespace framework {
 
         set(field: string, value: string): void;
 
+    }
+
+    interface Cookies {
+        get (name: string, options?: CookieAttr)
+        set (name: string, value: any, options?: CookieOptions)
     }
 
     interface IRequest extends Request {
