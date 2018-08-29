@@ -7,6 +7,7 @@ import * as uuid from 'uuid';
 import { ConfigContract } from '../../config/ConfigContract';
 import { MessageBroker } from '../../lib/message/MessageBroker';
 import { Logger } from '../../system/Logger'
+import { CommandBus } from '../CommandBus';
 
 @autoInject
 export class SchemaBrokerBus extends SchemaCommandBus {
@@ -14,7 +15,7 @@ export class SchemaBrokerBus extends SchemaCommandBus {
     private readonly id: string;
     private readonly queue: string;
 
-    private readonly types: { name: string, type: Command.Static<any> };
+    private types = new Map<string, CommandBus | any>();
 
     constructor(
         readonly logger: Logger,
@@ -32,6 +33,18 @@ export class SchemaBrokerBus extends SchemaCommandBus {
     }
 
     /**
+     * Get list of router
+     */
+    get routers() {
+        const { env, registry: { configuration: { "label": project } } } = this.config;
+
+        return {
+            topic: { name: `${project}.${env}.topic`, type: 'exchange' },
+            direct: { name: `${project}.${env}.direct`, type: 'exchange' }
+        };
+    }
+
+    /**
      * Initialize queue for subscribe
      */
     async subscribe() {
@@ -39,7 +52,7 @@ export class SchemaBrokerBus extends SchemaCommandBus {
 
 
         await messageBroker.connect();
-        await messageBroker.sub({ name, consume: () => this.consume });
+        await messageBroker.sub({ name, consume: this.consume.bind(this) });
 
         await this.routing();
     }
@@ -49,19 +62,19 @@ export class SchemaBrokerBus extends SchemaCommandBus {
      */
     async routing() {
         const { messageBroker, config, "queue": queueName } = this;
-        const { name, env, registry: { configuration: { "label": project } } } = config;
+        const { name, registry: { configuration: { "label": project } } } = config;
 
         const queue = { name: queueName, type: 'queue' };
 
-        const projectRouter = { name: `${project}.${env}`, type: 'mixed' };
-        const serviceRouter = { name: `${project}.${env}.${name}`, type: 'exchange' };
+        const { topic, direct } = this.routers;
 
         // Create router
-        await messageBroker.router({ name: projectRouter.name, type: 'topic' });
-        await messageBroker.router({ name: serviceRouter.name, type: 'direct' });
+        await messageBroker.router({ name: topic.name, type: 'topic' });
+        await messageBroker.router({ name: direct.name, type: 'direct' });
 
-        await messageBroker.routing({ src: projectRouter, dest: serviceRouter, pattern: `${projectRouter}.#` })
-        await messageBroker.routing({ src: serviceRouter, dest: queue, pattern: name });
+        await messageBroker.routing({ src: topic, dest: queue, pattern: `${project}.Demo` })
+        await messageBroker.routing({ src: topic, dest: queue, pattern: `${project}` })
+        await messageBroker.routing({ src: direct, dest: queue, pattern: name });
     }
 
     /**
@@ -72,9 +85,9 @@ export class SchemaBrokerBus extends SchemaCommandBus {
     private async consume(msg: any) {
 
         const { "content": raw, fields, properties } = msg;
-        const { "type": typeName, agruments } = JSON.parse(raw.toString('utf8'));
+        const { "command": type, agruments } = JSON.parse(raw.toString('utf8'));
 
-        const Type = this.types[typeName];
+        const Type = this.types.get(type);
         const command = new Type(agruments);
 
         const result = await this.execute(command);
@@ -91,7 +104,7 @@ export class SchemaBrokerBus extends SchemaCommandBus {
     register<T>(type: Command.Static<T>, handler: Command.Handler<T>, ) {
         super.register(type, handler);
 
-        if (type.name) this.types[type.name] = type;
+        if (type.name) this.types.set(type.name, type);
     }
 
     /**
@@ -100,19 +113,19 @@ export class SchemaBrokerBus extends SchemaCommandBus {
      * @param payload Payload
      */
     async publish(payload: Payload) {
-        const { config } = this;
-        const { env, registry: { configuration: { "label": project } } } = config;
 
-        let address = `${project}.${env}`;
-        if (payload.app) address = address.concat(`.${payload.app}.${payload.command}`);
+        return this.messageBroker.pub(
+            payload.app,
+            JSON.stringify(payload),
+            this.routers.direct.name
+        );
 
-        return this.messageBroker.pub(address, payload.content);
     }
 
 }
 
 export interface Payload {
-    command: string,
-    app?: string,
-    content: Object
+    app: string,
+    command: string | Object,
+    agruments: Object
 }

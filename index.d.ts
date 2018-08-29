@@ -192,8 +192,8 @@ declare namespace framework {
     }
 
     interface Cookies {
-        get (name: string, options?: CookieAttr)
-        set (name: string, value: any, options?: CookieOptions)
+        get(name: string, options?: CookieAttr)
+        set(name: string, value: any, options?: CookieOptions)
     }
 
     interface IRequest extends Request {
@@ -269,6 +269,12 @@ declare namespace framework {
 
     }
 
+    interface Payload {
+        app: string,
+        command: string | Object,
+        agruments: Object
+    }
+
     abstract class CommandBus {
 
         protected schemaPath: string;
@@ -285,7 +291,9 @@ declare namespace framework {
     }
 
     abstract class SchemaCommandBus extends CommandBus { }
-    abstract class SchemaBrokerBus extends CommandBus { }
+    abstract class SchemaBrokerBus extends CommandBus {
+        publish(payload: Payload);
+    }
 
     function retry<T>(fn: () => Promise<T>, options: RetryOptionDict): Promise<T>
 

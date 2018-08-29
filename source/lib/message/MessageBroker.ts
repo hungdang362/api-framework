@@ -7,7 +7,7 @@ export abstract class MessageBroker {
     abstract connect(): Promise<boolean>;
     abstract disconnect(): Promise<boolean>;
 
-    abstract pub(to, content): boolean;
+    abstract pub(to, content, router?: string): boolean;
     abstract sub(option: SubOption): Promise<MessageBroker>;
 
     /** Route feature only for RabbitMQ  */

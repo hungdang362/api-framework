@@ -123,11 +123,11 @@ export class RabbitMQ extends MessageBroker {
         return this;
     }
 
-    pub(to, content) {
+    pub(to, content, router?: string) {
         const { options: { exchange }, channel } = this;
         if (!channel) return false;
 
-        return channel.publish(exchange, to, Buffer.from(content))
+        return channel.publish(router || exchange, to, Buffer.from(content))
     }
 
 }
