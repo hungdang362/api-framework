@@ -279,7 +279,7 @@ declare namespace framework {
 
         abstract resolve(): Promise<void>
 
-        abstract register<T>(type: any, handler: Command.Handler<T>);
+        abstract register<T>(type: Command.Static<T>, handler: Command.Handler<T>);
 
         abstract execute(command: any, callback?: Command.Callback): Promise<any>;
     }
