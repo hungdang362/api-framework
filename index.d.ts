@@ -167,6 +167,8 @@ declare namespace framework {
         request: IRequest;
         response: Response;
 
+        params: any;
+
         cookies: Cookies;
         state: any;
 
@@ -198,6 +200,7 @@ declare namespace framework {
 
     interface IRequest extends Request {
         query: any;
+        body: any;
     }
 
     interface Next {
