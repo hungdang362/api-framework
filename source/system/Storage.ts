@@ -1,6 +1,6 @@
 /// <reference path="../typings/continuation-local-storage.d.ts" />
 
-import { createNamespace } from 'continuation-local-storage';
+import { createNamespace } from 'cls-hooked';
 
 
 export class Storage {
