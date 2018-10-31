@@ -69,7 +69,7 @@ export class CloudProvider extends ConfigProviderContract {
         const key = keys.shift();
         if (!key) return val;
 
-        return { [key.toLowerCase()]: this.deepParse(keys, val, ++lvl) };
+        return { [key]: this.deepParse(keys, val, ++lvl) };
     }
 
     private parse(body: any[]) {

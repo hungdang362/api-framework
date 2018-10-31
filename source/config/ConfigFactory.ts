@@ -11,7 +11,8 @@ const providers: ConfigProviderContract[] = [
     new EnvironmentProvider(),
     new StaticProvider(),
     new CloudProvider(),
-    new StaticProvider()
+    new StaticProvider(),
+    new EnvironmentProvider()
 ];
 
 export async function ConfigFactory(path: string): Promise<ConfigContract> {
