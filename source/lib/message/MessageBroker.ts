@@ -31,7 +31,7 @@ export interface ConsumeCallback {
 
 export interface RouterOption {
     name: string,
-    type: '' | 'direct' | 'topic' | 'headers' | 'fanout' | 'match' | string,
+    type: '' | 'direct' | 'topic' | 'headers' | 'fanout' | 'match',
     options?: any
 }
 
