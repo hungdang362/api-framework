@@ -84,7 +84,7 @@ export class RabbitMQ extends MessageBroker {
         let { options, type, name } = option;
 
         options = { ...options, ...{ durable: false, autoDelete: true } };
-        // if (channel) await channel.assertExchange(name, type, options);
+        if (channel) await channel.assertExchange(name, type, options);
 
         commits.set(`router:${name}`, { func: this.router, option });
 
